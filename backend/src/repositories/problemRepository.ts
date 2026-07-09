@@ -9,6 +9,7 @@ export const problemRepository = {
     sort: Record<string, mongoose.SortOrder> = { frequency: -1 }
   ) {
     const problems = await Problem.find(filter)
+      .select('_id title slug difficulty topics companies frequency leetcodeUrl isPremium acceptanceRate') // select needed fields, omitted createdAt, updatedAt
       .sort(sort)
       .skip(skip)
       .limit(limit)

@@ -109,6 +109,15 @@ export default function CompanyDetail() {
           problems={problems} 
           userProgress={userProgress} 
           onProgressUpdate={fetchProgress} 
+          onOptimisticUpdate={(problemId, updates) => {
+            setUserProgress(prev => ({
+              ...prev,
+              [problemId]: {
+                ...(prev[problemId] || { solved: false, revision: false }),
+                ...updates
+              }
+            }));
+          }}
         />
       </div>
     </div>

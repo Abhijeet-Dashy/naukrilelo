@@ -1,7 +1,7 @@
 import { Badge } from '../ui/Badge';
 import { useAuth } from '../../context/AuthContext';
 import { progressService } from '../../services/progressService';
-import { FiExternalLink } from 'react-icons/fi';
+import { FiExternalLink, FiBookmark } from 'react-icons/fi';
 
 interface Problem {
   _id: string;
@@ -16,28 +16,41 @@ interface ProblemTableProps {
   problems: Problem[];
   userProgress?: Record<string, { solved: boolean, revision: boolean }>;
   onProgressUpdate?: () => void;
+  onOptimisticUpdate?: (problemId: string, updates: { solved?: boolean, revision?: boolean }) => void;
 }
 
-export function ProblemTable({ problems, userProgress = {}, onProgressUpdate }: ProblemTableProps) {
+export function ProblemTable({ problems, userProgress = {}, onProgressUpdate, onOptimisticUpdate }: ProblemTableProps) {
   const { user } = useAuth();
 
   const handleSolvedChange = async (problemId: string, currentVal: boolean) => {
     if (!user) return alert('Please login to track progress');
+    if (onOptimisticUpdate) {
+      onOptimisticUpdate(problemId, { solved: !currentVal });
+    }
     try {
       await progressService.toggleSolved(problemId, !currentVal);
       if (onProgressUpdate) onProgressUpdate();
     } catch (e) {
       console.error(e);
+      if (onOptimisticUpdate) {
+        onOptimisticUpdate(problemId, { solved: currentVal }); // revert
+      }
     }
   };
 
   const handleRevisionChange = async (problemId: string, currentVal: boolean) => {
     if (!user) return alert('Please login to track progress');
+    if (onOptimisticUpdate) {
+      onOptimisticUpdate(problemId, { revision: !currentVal });
+    }
     try {
       await progressService.toggleRevision(problemId, !currentVal);
       if (onProgressUpdate) onProgressUpdate();
     } catch (e) {
       console.error(e);
+      if (onOptimisticUpdate) {
+        onOptimisticUpdate(problemId, { revision: currentVal }); // revert
+      }
     }
   };
 
@@ -64,7 +77,7 @@ export function ProblemTable({ problems, userProgress = {}, onProgressUpdate }: 
                     type="checkbox" 
                     checked={isSolved}
                     onChange={() => handleSolvedChange(prob._id, isSolved)}
-                    className="w-4 h-4 rounded border-border bg-background focus:ring-primaryText text-primaryText"
+                    className="w-5 h-5 rounded-full border-border bg-background focus:ring-primaryText text-primaryText cursor-pointer transition-all"
                   />
                 </td>
                 <td className="px-4 py-3 font-medium font-mono text-[13.5px]">
@@ -82,12 +95,14 @@ export function ProblemTable({ problems, userProgress = {}, onProgressUpdate }: 
                   <span className="text-secondaryText text-xs">{(prob.topics || []).join(', ')}</span>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <input 
-                    type="checkbox" 
-                    checked={isRevision}
-                    onChange={() => handleRevisionChange(prob._id, isRevision)}
-                    className="w-4 h-4 rounded border-border bg-background focus:ring-warning text-warning"
-                  />
+                  <button 
+                    onClick={() => handleRevisionChange(prob._id, isRevision)}
+                    className="focus:outline-none p-1 rounded hover:bg-surface/80 transition-colors"
+                  >
+                    <FiBookmark 
+                      className={`w-5 h-5 transition-all ${isRevision ? 'text-warning fill-warning' : 'text-secondaryText hover:text-warning'}`} 
+                    />
+                  </button>
                 </td>
               </tr>
             );

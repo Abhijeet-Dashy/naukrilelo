@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://naukrilelo-xlpa.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : 'https://naukrilelo-xlpa.onrender.com/api'),
 });
 
 // Add a request interceptor to attach the JWT token

@@ -16,7 +16,7 @@ export interface ICompany extends Document {
 
 const CompanySchema: Schema = new Schema(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true, index: true },
     slug: { type: String, required: true, unique: true, index: true },
     logo: { type: String },
     totalProblems: { type: Number, default: 0 },

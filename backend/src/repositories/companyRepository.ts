@@ -9,6 +9,7 @@ export const companyRepository = {
     sort: Record<string, mongoose.SortOrder> = { name: 1 }
   ) {
     const companies = await Company.find(filter)
+      .select('_id name slug logo totalProblems difficultyCount')
       .sort(sort)
       .skip(skip)
       .limit(limit)

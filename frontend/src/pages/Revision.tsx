@@ -52,6 +52,18 @@ export default function Revision() {
           problems={problems} 
           userProgress={userProgress} 
           onProgressUpdate={fetchRevisionQueue} 
+          onOptimisticUpdate={(problemId, updates) => {
+            setUserProgress(prev => ({
+              ...prev,
+              [problemId]: {
+                ...(prev[problemId] || { solved: false, revision: false }),
+                ...updates
+              }
+            }));
+            
+            // Note: Optimistically hiding problems from revision queue might be jarring if they misclick,
+            // so we'll just let the state update and the next fetchRevisionQueue will handle the removal.
+          }}
         />
       )}
     </div>
