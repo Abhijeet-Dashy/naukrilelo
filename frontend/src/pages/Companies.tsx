@@ -6,26 +6,41 @@ import { Input } from '../components/ui/Input';
 import { FiSearch } from 'react-icons/fi';
 import { useDebounce } from '../hooks/useDebounce';
 import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
 
 export default function Companies() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 500);
   const [loading, setLoading] = useState(true);
+  const [limit, setLimit] = useState(100);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Reset limit when search term changes
+  useEffect(() => {
+    setLimit(100);
+  }, [debouncedSearch]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
       setLoading(true);
       try {
-        const data = await companyService.getCompanies({ search: debouncedSearch, limit: 50 });
+        const data = await companyService.getCompanies({ 
+          search: debouncedSearch, 
+          limit: limit,
+          sort: 'problems_desc'
+        });
         setCompanies(data.companies);
+        if (data.pagination) {
+          setTotalCount(data.pagination.total);
+        }
       } catch (error) {
         console.error(error);
       }
       setLoading(false);
     };
     fetchCompanies();
-  }, [debouncedSearch]);
+  }, [debouncedSearch, limit]);
 
   return (
     <div className="space-y-6">
@@ -44,32 +59,47 @@ export default function Companies() {
         </div>
       </div>
 
-      {loading ? (
+      {loading && companies.length === 0 ? (
         <div className="text-secondaryText">Loading companies...</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {companies.map((company) => (
-            <Link key={company._id} to={`/company/${company.slug}`} className="group block">
-              <Card className="h-full hover:border-primaryText/50 transition-colors duration-200">
-                <CardHeader>
-                  <CardTitle className="group-hover:text-accent transition-colors">
-                    {company.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-3xl font-bold">{company.totalProblems} <span className="text-sm font-normal text-secondaryText">problems</span></div>
-                  <div className="flex space-x-2">
-                    <Badge variant="success">{company.difficultyCount?.easy || 0}</Badge>
-                    <Badge variant="warning">{company.difficultyCount?.medium || 0}</Badge>
-                    <Badge variant="danger">{company.difficultyCount?.hard || 0}</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-          {companies.length === 0 && (
-            <div className="col-span-full text-center py-12 text-secondaryText">
-              No companies found matching your search.
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {companies.map((company) => (
+              <Link key={company._id} to={`/company/${company.slug}`} className="group block">
+                <Card className="h-full hover:border-primaryText/50 transition-colors duration-200">
+                  <CardHeader>
+                    <CardTitle className="group-hover:text-accent transition-colors">
+                      {company.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="text-3xl font-bold">{company.totalProblems} <span className="text-sm font-normal text-secondaryText">problems</span></div>
+                    <div className="flex space-x-2">
+                      <Badge variant="success">{company.difficultyCount?.easy || 0}</Badge>
+                      <Badge variant="warning">{company.difficultyCount?.medium || 0}</Badge>
+                      <Badge variant="danger">{company.difficultyCount?.hard || 0}</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+            {companies.length === 0 && (
+              <div className="col-span-full text-center py-12 text-secondaryText">
+                No companies found matching your search.
+              </div>
+            )}
+          </div>
+          
+          {companies.length > 0 && companies.length < totalCount && (
+            <div className="flex justify-center pt-2 pb-8">
+              <Button 
+                variant="outline" 
+                className="px-8 rounded-full border-border hover:bg-surface"
+                onClick={() => setLimit(totalCount)}
+                disabled={loading}
+              >
+                {loading ? 'Loading...' : 'View All Companies'}
+              </Button>
             </div>
           )}
         </div>

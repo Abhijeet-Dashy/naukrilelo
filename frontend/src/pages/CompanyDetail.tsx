@@ -77,18 +77,18 @@ export default function CompanyDetail() {
         <p className="text-secondaryText mt-2">{company.totalProblems} problems indexed</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 gap-3 md:gap-6">
         <Card className="bg-surface">
-          <CardHeader><CardTitle className="text-sm text-secondaryText">Easy</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold text-success">{company.difficultyCount?.easy || 0}</div></CardContent>
+          <CardHeader className="p-3 md:p-6"><CardTitle className="text-xs md:text-sm text-secondaryText">Easy</CardTitle></CardHeader>
+          <CardContent className="p-3 pt-0 md:p-6 md:pt-0"><div className="text-xl md:text-3xl font-bold text-success">{company.difficultyCount?.easy || 0}</div></CardContent>
         </Card>
         <Card className="bg-surface">
-          <CardHeader><CardTitle className="text-sm text-secondaryText">Medium</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold text-warning">{company.difficultyCount?.medium || 0}</div></CardContent>
+          <CardHeader className="p-3 md:p-6"><CardTitle className="text-xs md:text-sm text-secondaryText">Medium</CardTitle></CardHeader>
+          <CardContent className="p-3 pt-0 md:p-6 md:pt-0"><div className="text-xl md:text-3xl font-bold text-warning">{company.difficultyCount?.medium || 0}</div></CardContent>
         </Card>
         <Card className="bg-surface">
-          <CardHeader><CardTitle className="text-sm text-secondaryText">Hard</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold text-danger">{company.difficultyCount?.hard || 0}</div></CardContent>
+          <CardHeader className="p-3 md:p-6"><CardTitle className="text-xs md:text-sm text-secondaryText">Hard</CardTitle></CardHeader>
+          <CardContent className="p-3 pt-0 md:p-6 md:pt-0"><div className="text-xl md:text-3xl font-bold text-danger">{company.difficultyCount?.hard || 0}</div></CardContent>
         </Card>
       </div>
 
